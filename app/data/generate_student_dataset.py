@@ -110,6 +110,7 @@ for i in range(1, NUM_STUDENTS + 1):
             "wishes": [
                 {"name": school, "rank": rank + 1} for rank, school in enumerate(wishes)
             ],
+            "capacity": 1,
         }
     )
 
