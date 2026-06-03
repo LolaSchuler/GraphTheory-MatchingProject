@@ -1,3 +1,4 @@
-*/schools.json
-*/students.json
+/data/schools.json
+/data/students.json
+.venv
 */__pycache__/*
