@@ -1,62 +1,61 @@
 
 
-def setupRound(suitors, courted) :
-    # Every suitor goes to its favorite's balcony
-    balconies = []
-    # Initialize empty balconies for every courted
-    for i in range(len(courted)) :
-        balconies[i] = []
-    # Loops through suitors to make each one go to the right balcony
-    for suitor in suitors :
-        suitorWishes = suitor["wishes"]
-        # Find the right courted according to the current wish
-        currentWishName = suitorWishes[suitor["current_wish"]]["name"]
-        balconyNumber = getIndexInWishesByName(courted, currentWishName)
-        # Add the suitor's name to the right courted's balcony
-        balconies[balconyNumber].append(suitor)
+def setupRound(suitors, courted):
+    balconies = {}
+    for courtedEntity in courted:
+        balconies[courtedEntity["id"]] = []
+    for suitor in suitors:
+        # If suitor's capacity is full for now
+        if len(suitor["matches"]) == suitor["capacity"]:
+            continue
+        # If no more wishes for this suitor
+        if suitor["current_wish"] >= len(suitor["wishes"]):
+            continue
+        # Else, add the suitor to his current wish's balcony
+        targetId = suitor["wishes"][suitor["current_wish"]]["id"]
+        balconies[targetId].append(suitor)
     return balconies
 
-def launchRound(balconies, courted) :
-    # Each courted chooses its preferred suitor
-    for i in range(len(courted)) :
-        # If the courted has less than two suitors, it doesn't have to choose
-        if len(balconies[i]) < 2 :
-            continue
-        # If the courted has 2 or more suitors, it has to choose its favorite
-        preferredSuitorName = balconies[i][0]["name"]
-        for suitor in balconies[i] :
-            if prefers(courted[i], preferredSuitorName, suitor["name"]) :
-                preferredSuitorName = suitor["name"]
-                suitor["current_wish"] -= 1
+def launchRound(balconies, courted):
+    for courtedEntity in courted:
+        # Get the candidates for this courted entity (current matches + new suitors in the balcony)
+        courtedId = courtedEntity["id"]
+        candidates = courtedEntity["matches"] + balconies[courtedId]
+        # Sort the candidates according to the wishes of the courtedEntity
+        candidates.sort(
+            key=lambda suitor:
+            getRankById(courtedEntity["wishes"], suitor["id"])
+        )
+        # Keep only the best candidates according to the capacity of the courted entity and reject all others
+        accepted = candidates[:courtedEntity["capacity"]]
+        rejected = candidates[courtedEntity["capacity"]:]
+        # Update matches of courtedEntity and of accepted suitors
+        courtedEntity["matches"] = accepted
+        for acceptedSuitor in accepted:
+            if courtedEntity not in acceptedSuitor["matches"]:
+                acceptedSuitor["matches"].append(courtedEntity)
+        # Update the rejected candidates by removing the match and moving on to the next wish
+        for rejectedSuitor in rejected:
+            if courtedEntity in rejectedSuitor["matches"]:
+                rejectedSuitor["matches"].remove(courtedEntity)
+            rejectedSuitor["current_wish"] += 1
+        
 
 
-def endRound(balconies, courted) :
-    # Verify if everyone is paired up
-    for i in range(len(courted)) :
-        if len(balconies[i]) != 1 :
-            return False
+def endRound(suitors) :
+    for suitor in suitors:
+        # Suitor still has some space available
+        if len(suitor["matches"]) < suitor["capacity"]:
+            # Suitor still has some wishes available
+            if suitor["current_wish"] < len(suitor["wishes"]):
+                return False
     return True
 
-def prefers(courted, suitor1Name, suitor2Name) :
-    # Returns True if the courted one prefers suitor1 to suitor2. Else, returns False.
-    wishes = courted["wishes"]
-    rankSuitor1 = getRankByName(wishes, suitor1Name)
-    rankSuitor2 = getRankByName(wishes, suitor2Name)
-    if rankSuitor1 > rankSuitor2 :
-        return True
-    else :
-        return False
 
-
-def getRankByName(wishes, name) :
-    # Parse through the wishes and returns the rank of the wish corresponding to the name
+def getRankById(wishes, suitorId) :
+    # Parse through the wishes and returns the rank of the wish corresponding to the id
     for i in range(len(wishes)) :
-        if wishes[i]["name"] == name :
+        if wishes[i]["id"] == suitorId :
             return wishes[i]["rank"]
 
-def getIndexInWishesByName(wishes, name) :
-    # Parse through the wishes and returns the index of the wish corresponding to the name
-    for j in range(len(wishes)) :
-        if name == wishes[j]["name"] :
-            return j
 

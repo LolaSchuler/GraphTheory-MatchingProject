@@ -2,9 +2,9 @@
 from services.matchingLauncher import TYPE
 
 def launchGUI() :
-    print("-------------------------------------------------\n")
-    print("-              Graph Theory Project             -\n")
-    print("-------------------------------------------------\n")
+    print("         -------------------------------------------------\n")
+    print("         -              Graph Theory Project             -\n")
+    print("         -------------------------------------------------\n")
 
 def determineSuitors():
     while True :

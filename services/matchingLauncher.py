@@ -6,16 +6,32 @@ from enum import Enum
 class TYPE(Enum):
     SCHOOL, STUDENTS = range(2)
 
-def startMatching(suitor):
-    schoolDataPath = "./schools.json"
-    studentDataPath = "./students.json"
+
+def initMatching(suitor) :
+    # Load school and student data from json files
+    schoolsDataPath = "./data/schools.json"
+    studentsDataPath = "./data/students.json"
     # Initialize suitors and courted
+    with open(schoolsDataPath, 'r') as schoolsData:
+        schools = json.loads(schoolsData.read())
+    with open(studentsDataPath, 'r') as studentsData:
+        students = json.loads(studentsData.read())
     if suitor == TYPE.SCHOOL :
-        suitors = json.loads(schoolDataPath)
-        courted = json.loads(studentDataPath)
+        suitors = schools
+        courted = students
     elif suitor == TYPE.STUDENTS :
-        suitors = json.loads(studentDataPath)
-        courted = json.loads(schoolDataPath)
+        suitors = students
+        courted = schools
+    # Add matches and current_wish fields to all entities
+    for entity in schools + students:
+        entity["matches"] = []
+        entity["current_wish"] = 0
+    return suitors, courted
+
+
+def startMatching(suitor):
+    # Initialize suitors and courted
+    suitors, courted = initMatching(suitor)
     # Launch the matching loop
     nbRounds = 0
     finished = False
@@ -25,4 +41,7 @@ def startMatching(suitor):
         launchRound(balconies, courted)
         finished = endRound(balconies, courted)
     return nbRounds
+
+
+
 
