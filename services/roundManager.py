@@ -8,17 +8,17 @@ def setupRound(suitors, courted) :
         balconies[i] = []
     # Loops through suitors to make each one go to the right balcony
     for suitor in suitors :
-        wishes = suitor["wishes"]
+        suitorWishes = suitor["wishes"]
         # Find the right courted according to the current wish
-        currentWishName = wishes[suitor["current_wish"]]["name"]
-        balconyNumber = getIndexInDictByName(courted, currentWishName)
+        currentWishName = suitorWishes[suitor["current_wish"]]["name"]
+        balconyNumber = getIndexInWishesByName(courted, currentWishName)
         # Add the suitor's name to the right courted's balcony
         balconies[balconyNumber].append(suitor)
     return balconies
 
-def launchRound(balconies, suitors, courted) :
+def launchRound(balconies, courted) :
     # Each courted chooses its preferred suitor
-    for i in len(courted) :
+    for i in range(len(courted)) :
         # If the courted has less than two suitors, it doesn't have to choose
         if len(balconies[i]) < 2 :
             continue
@@ -30,11 +30,12 @@ def launchRound(balconies, suitors, courted) :
                 suitor["current_wish"] -= 1
 
 
-def endRound(finished) :
+def endRound(balconies, courted) :
     # Verify if everyone is paired up
-    computeFinished(finished)
-    nbRounds += 1
-
+    for i in range(len(courted)) :
+        if len(balconies[i]) != 1 :
+            return False
+    return True
 
 def prefers(courted, suitor1Name, suitor2Name) :
     # Returns True if the courted one prefers suitor1 to suitor2. Else, returns False.
@@ -49,16 +50,13 @@ def prefers(courted, suitor1Name, suitor2Name) :
 
 def getRankByName(wishes, name) :
     # Parse through the wishes and returns the rank of the wish corresponding to the name
-    for i in len(wishes) :
+    for i in range(len(wishes)) :
         if wishes[i]["name"] == name :
             return wishes[i]["rank"]
 
-def getIndexInDictByName(dictionary, name) :
-    # Parse through the dict and returns the index of the wish corresponding to the name
-    for j in len(dictionary) :
-        if name == dictionary[j]["name"] :
+def getIndexInWishesByName(wishes, name) :
+    # Parse through the wishes and returns the index of the wish corresponding to the name
+    for j in range(len(wishes)) :
+        if name == wishes[j]["name"] :
             return j
 
-
-def computeFinished(finished):
-    pass

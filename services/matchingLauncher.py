@@ -7,20 +7,22 @@ class TYPE(Enum):
     SCHOOL, STUDENTS = range(2)
 
 def startMatching(suitor):
-    finished = False
+    schoolDataPath = "./schools.json"
+    studentDataPath = "./students.json"
     # Initialize suitors and courted
     if suitor == TYPE.SCHOOL :
-        suitors = json.loads("./schools.json")
-        courted = json.loads("./students.json")
+        suitors = json.loads(schoolDataPath)
+        courted = json.loads(studentDataPath)
     elif suitor == TYPE.STUDENTS :
-        suitors = json.loads("./students.json")
-        courted = json.loads("./schools.json")
+        suitors = json.loads(studentDataPath)
+        courted = json.loads(schoolDataPath)
     # Launch the matching loop
+    nbRounds = 0
+    finished = False
     while not finished :
+        nbRounds += 1
         balconies = setupRound(suitors, courted)
-        launchRound(balconies, suitors, courted)
-        endRound(finished)
-    endMatching()
+        launchRound(balconies, courted)
+        finished = endRound(balconies, courted)
+    return nbRounds
 
-def endMatching():
-    pass
