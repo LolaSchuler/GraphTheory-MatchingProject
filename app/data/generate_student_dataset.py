@@ -83,6 +83,7 @@ for i in range(NUM_SCHOOLS):
             "capacity": capacity,
             "quotas": quotas,
             "selection": selection,
+            "wishes": [],
         }
     )
 
@@ -97,7 +98,7 @@ for i in range(1, NUM_STUDENTS + 1):
     else:
         specialty = "professional"
 
-    wishes = random.sample([school["id"] for school in schools], k=NUM_SCHOOLS)
+    student_wishes = random.sample([school["id"] for school in schools], k=NUM_SCHOOLS)
     grade = round(random.uniform(9, 20), 1)
 
     students.append(
@@ -108,9 +109,23 @@ for i in range(1, NUM_STUDENTS + 1):
             "academy": random.choice(academies),
             "current_wish": 1,
             "wishes": [
-                {"name": school, "rank": rank + 1} for rank, school in enumerate(wishes)
+                {"name": school, "rank": rank + 1}
+                for rank, school in enumerate(student_wishes)
             ],
+            "capacity": 1,
         }
+    )
+
+# Rewrite schools wishes
+for school in schools:
+    school_wishes = random.sample(
+        [student["id"] for student in students], k=NUM_STUDENTS
+    )
+    school["wishes"] = (
+        [
+            {"name": student, "rank": rank + 1}
+            for rank, student in enumerate(school_wishes)
+        ],
     )
 
 # Export
