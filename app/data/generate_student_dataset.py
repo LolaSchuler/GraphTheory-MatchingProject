@@ -119,7 +119,7 @@ for i in range(1, NUM_STUDENTS + 1):
 # Rewrite schools wishes
 for school in schools:
     school_wishes = random.sample(
-        [student["id"] for student in students], k=school["capacity"]
+        [student["id"] for student in students], k=NUM_STUDENTS
     )
     school["wishes"] = (
         [
