@@ -1,5 +1,5 @@
 
-from services.matchingLauncher import TYPE
+from app.matching.matchingLauncher import TYPE
 
 def launchGUI() :
     print("         -------------------------------------------------\n")
@@ -16,5 +16,5 @@ def determineSuitors():
 
 def endMatching(nbRounds):
     print("\nMatching fini\n")
-    print("Nombre de Rounds nécessaires pour que tous les élèves aient une place : ", nbRounds)
+    print("Nombre de Rounds nécessaires pour trouver les meilleurs matchs : ", nbRounds)
     

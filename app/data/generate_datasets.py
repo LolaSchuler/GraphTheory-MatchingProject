@@ -107,9 +107,8 @@ for i in range(1, NUM_STUDENTS + 1):
             "specialty": specialty,
             "grade": grade,
             "academy": random.choice(academies),
-            "current_wish": 1,
             "wishes": [
-                {"name": school, "rank": rank + 1}
+                {"id": school, "rank": rank + 1}
                 for rank, school in enumerate(student_wishes)
             ],
             "capacity": 1
@@ -123,16 +122,16 @@ for school in schools:
     )
     school["wishes"] = (
         [
-            {"name": student, "rank": rank + 1}
+            {"id": student, "rank": rank + 1}
             for rank, student in enumerate(school_wishes)
-        ],
+        ]
     )
 
 # Export
-with open("schools.json", "w", encoding="utf-8") as f:
+with open("./app/data/schools.json", "w", encoding="utf-8") as f:
     json.dump(schools, f, indent=4)
 
-with open("students.json", "w", encoding="utf-8") as f:
+with open("./app/data/students.json", "w", encoding="utf-8") as f:
     json.dump(students, f, indent=4)
 
 print("Generation Successful")
