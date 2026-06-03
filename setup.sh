@@ -11,6 +11,6 @@ echo "Mise à jour de pip..."
 python -m pip install --upgrade pip
 
 echo "Installation des dépendances..."
-pip install -r ../requirements.txt
+pip install -r ./requirements.txt
 
 echo "Installation terminée."

@@ -1,0 +1,170 @@
+[
+    {
+        "id": "S1",
+        "name": "Ecole S1",
+        "academy": "Lyon",
+        "type": "IUT",
+        "capacity": 16,
+        "quotas": {
+            "general": 6,
+            "technological": 6,
+            "professional": 4
+        },
+        "selection": {
+            "academy_bonus": 2,
+            "minimum_grade": 12,
+            "specialty_bonus": {
+                "general": 1,
+                "technological": 2,
+                "professional": 0
+            }
+        }
+    },
+    {
+        "id": "S2",
+        "name": "Ecole S2",
+        "academy": "Lyon",
+        "type": "IUT",
+        "capacity": 16,
+        "quotas": {
+            "general": 6,
+            "technological": 6,
+            "professional": 4
+        },
+        "selection": {
+            "academy_bonus": 1,
+            "minimum_grade": 12,
+            "specialty_bonus": {
+                "general": 1,
+                "technological": 2,
+                "professional": 0
+            }
+        }
+    },
+    {
+        "id": "S3",
+        "name": "Ecole S3",
+        "academy": "Versailles",
+        "type": "IUT",
+        "capacity": 19,
+        "quotas": {
+            "general": 7,
+            "technological": 7,
+            "professional": 5
+        },
+        "selection": {
+            "academy_bonus": 1,
+            "minimum_grade": 12,
+            "specialty_bonus": {
+                "general": 1,
+                "technological": 2,
+                "professional": 0
+            }
+        }
+    },
+    {
+        "id": "S4",
+        "name": "Ecole S4",
+        "academy": "Lyon",
+        "type": "Universit\u00e9",
+        "capacity": 13,
+        "quotas": {
+            "general": 7,
+            "technological": 2,
+            "professional": 4
+        },
+        "selection": {
+            "academy_bonus": 3,
+            "minimum_grade": 10,
+            "specialty_bonus": {
+                "general": 2,
+                "technological": 1,
+                "professional": 1
+            }
+        }
+    },
+    {
+        "id": "S5",
+        "name": "Ecole S5",
+        "academy": "Versailles",
+        "type": "BTS",
+        "capacity": 10,
+        "quotas": {
+            "general": 5,
+            "technological": 3,
+            "professional": 2
+        },
+        "selection": {
+            "academy_bonus": 0,
+            "minimum_grade": 9,
+            "specialty_bonus": {
+                "general": 0,
+                "technological": 1,
+                "professional": 2
+            }
+        }
+    },
+    {
+        "id": "S6",
+        "name": "Ecole S6",
+        "academy": "Lyon",
+        "type": "IUT",
+        "capacity": 18,
+        "quotas": {
+            "general": 7,
+            "technological": 7,
+            "professional": 4
+        },
+        "selection": {
+            "academy_bonus": 0,
+            "minimum_grade": 12,
+            "specialty_bonus": {
+                "general": 1,
+                "technological": 2,
+                "professional": 0
+            }
+        }
+    },
+    {
+        "id": "S7",
+        "name": "Ecole S7",
+        "academy": "Toulouse",
+        "type": "BTS",
+        "capacity": 9,
+        "quotas": {
+            "general": 4,
+            "technological": 2,
+            "professional": 3
+        },
+        "selection": {
+            "academy_bonus": 2,
+            "minimum_grade": 9,
+            "specialty_bonus": {
+                "general": 0,
+                "technological": 1,
+                "professional": 2
+            }
+        }
+    },
+    {
+        "id": "S8",
+        "name": "Ecole S8",
+        "academy": "Versailles",
+        "type": "IUT",
+        "capacity": 19,
+        "quotas": {
+            "general": 7,
+            "technological": 7,
+            "professional": 5
+        },
+        "selection": {
+            "academy_bonus": 1,
+            "minimum_grade": 12,
+            "specialty_bonus": {
+                "general": 1,
+                "technological": 2,
+                "professional": 0
+            }
+        }
+    }
+]

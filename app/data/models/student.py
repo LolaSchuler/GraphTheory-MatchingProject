@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 @dataclass
 class Wish:
-    school: str
+    id: str
     rank: int
 
 @dataclass

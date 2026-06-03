@@ -1,3 +1,4 @@
-schools.json
-students.json
+/app/data/schools.json
+/app/data/students.json
 .venv
+*/__pycache__/*
