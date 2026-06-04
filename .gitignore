@@ -1,4 +1,3 @@
-/app/data/schools.json
-/app/data/students.json
 .venv
-*/__pycache__/*
+__pycache__/
+**/dataset/*

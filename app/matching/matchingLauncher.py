@@ -1,7 +1,10 @@
 import json
-
+from pathlib import Path
 from app.matching.roundManager import setupRound, launchRound, endRound
 from enum import Enum
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DATA_PATH = PROJECT_ROOT / "app" / "data" / "dataset"
 
 
 class TYPE(Enum):
@@ -10,8 +13,8 @@ class TYPE(Enum):
 
 def initMatching(suitorChoice):
     # Load school and student data from json files
-    schoolsDataPath = "./app/data/schools.json"
-    studentsDataPath = "./app/data/students.json"
+    schoolsDataPath = DATA_PATH / "schools.json"
+    studentsDataPath = DATA_PATH / "students.json"
     # Initialize suitors and courted
     with open(schoolsDataPath, "r") as schoolsData:
         schools = json.loads(schoolsData.read())
