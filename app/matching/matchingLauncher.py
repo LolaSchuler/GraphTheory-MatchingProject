@@ -3,11 +3,13 @@ from pathlib import Path
 from app.matching.roundManager import setupRound, launchRound, endRound
 from enum import Enum
 
-from pathlib import Path
-
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
 DATA_PATH = PROJECT_ROOT / "app" / "data" / "dataset"
 OUTPUT_PATH = PROJECT_ROOT / "app" / "outputs" / "matching_output.json"
+
+DATA_PATH.mkdir(parents=True, exist_ok=True)
+OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 
 class TYPE(Enum):

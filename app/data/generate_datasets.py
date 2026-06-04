@@ -8,6 +8,8 @@ DATA_DIR = PROJECT_ROOT / "app" / "data" / "dataset"
 SCHOOLS_FILE = DATA_DIR / "schools.json"
 STUDENTS_FILE = DATA_DIR / "students.json"
 
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+
 NUM_SCHOOLS = 3
 NUM_STUDENTS = NUM_SCHOOLS * 15
 
