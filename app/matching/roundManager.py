@@ -1,5 +1,3 @@
-
-
 def setupRound(suitors, courted):
     balconies = {}
     for courtedEntity in courted:
@@ -16,6 +14,7 @@ def setupRound(suitors, courted):
         balconies[targetId].append(suitor)
     return balconies
 
+
 def launchRound(balconies, courted):
     for courtedEntity in courted:
         # Get the candidates for this courted entity (current matches + new suitors in the balcony)
@@ -23,12 +22,11 @@ def launchRound(balconies, courted):
         candidates = courtedEntity["matches"] + balconies[courtedId]
         # Sort the candidates according to the wishes of the courtedEntity
         candidates.sort(
-            key=lambda suitor:
-            getRankById(courtedEntity["wishes"], suitor["id"])
+            key=lambda suitor: getRankById(courtedEntity["wishes"], suitor["id"])
         )
         # Keep only the best candidates according to the capacity of the courted entity and reject all others
-        accepted = candidates[:courtedEntity["capacity"]]
-        rejected = candidates[courtedEntity["capacity"]:]
+        accepted = candidates[: courtedEntity["capacity"]]
+        rejected = candidates[courtedEntity["capacity"] :]
         # Update matches of courtedEntity and of accepted suitors
         courtedEntity["matches"] = accepted
         for acceptedSuitor in accepted:
@@ -39,10 +37,9 @@ def launchRound(balconies, courted):
             if courtedEntity in rejectedSuitor["matches"]:
                 rejectedSuitor["matches"].remove(courtedEntity)
             rejectedSuitor["current_wish"] += 1
-        
 
 
-def endRound(suitors) :
+def endRound(suitors):
     for suitor in suitors:
         # Suitor still has some space available
         if len(suitor["matches"]) < suitor["capacity"]:
@@ -52,10 +49,8 @@ def endRound(suitors) :
     return True
 
 
-def getRankById(wishes, suitorId) :
+def getRankById(wishes, suitorId):
     # Parse through the wishes and returns the rank of the wish corresponding to the id
-    for i in range(len(wishes)) :
-        if wishes[i]["id"] == suitorId :
+    for i in range(len(wishes)):
+        if wishes[i]["id"] == suitorId:
             return wishes[i]["rank"]
-
-
