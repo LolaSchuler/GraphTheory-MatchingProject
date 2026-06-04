@@ -111,7 +111,7 @@ for i in range(1, NUM_STUDENTS + 1):
                 {"id": school, "rank": rank + 1}
                 for rank, school in enumerate(student_wishes)
             ],
-            "capacity": 1
+            "capacity": 1,
         }
     )
 
@@ -120,12 +120,9 @@ for school in schools:
     school_wishes = random.sample(
         [student["id"] for student in students], k=NUM_STUDENTS
     )
-    school["wishes"] = (
-        [
-            {"id": student, "rank": rank + 1}
-            for rank, student in enumerate(school_wishes)
-        ]
-    )
+    school["wishes"] = [
+        {"id": student, "rank": rank + 1} for rank, student in enumerate(school_wishes)
+    ]
 
 # Export
 with open("./app/data/schools.json", "w", encoding="utf-8") as f:
