@@ -2,3 +2,4 @@
 /app/data/students.json
 .venv
 */__pycache__/*
+/outputs/*
