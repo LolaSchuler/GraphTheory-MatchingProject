@@ -1,8 +1,8 @@
 import json
 import random
 
-NUM_SCHOOLS = 8
-NUM_STUDENTS = 120
+NUM_SCHOOLS = 3
+NUM_STUDENTS = NUM_SCHOOLS * 15
 
 academies = ["Versailles", "Toulouse", "Paris", "Lyon"]
 school_types = ["BTS", "Université", "IUT", "CPGE"]

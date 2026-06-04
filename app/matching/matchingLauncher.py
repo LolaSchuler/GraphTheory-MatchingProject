@@ -41,4 +41,23 @@ def startMatching(suitorChoice):
         balconies = setupRound(suitors, courted)
         launchRound(balconies, courted)
         finished = endRound(suitors)
+    createOutputJSON(suitors, courted)
     return nbRounds
+
+
+def createOutputJSON(suitors, courted):
+    output = []
+    for suitor in suitors:
+        for match in suitor["matches"]:
+            courtedEntity = next((c for c in courted if c["id"] == match["id"]), None)
+            if courtedEntity is not None:
+                output.append(
+                    {
+                        "suitor_id": suitor["id"],
+                        "suitor_name": suitor.get("name", suitor["id"]),
+                        "courted_id": courtedEntity["id"],
+                        "courted_name": courtedEntity.get("name", courtedEntity["id"]),
+                    }
+                )
+    with open("./outputs/matching_output.json", "w", encoding="utf-8") as f:
+        json.dump(output, f, ensure_ascii=False, indent=4)
