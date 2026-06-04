@@ -23,6 +23,12 @@ class Selection:
 
 
 @dataclass
+class Wish:
+    id: str
+    rank: int
+
+
+@dataclass
 class School:
     id: str
     name: str
@@ -30,3 +36,4 @@ class School:
     capacity: int
     quotas: Quotas
     selection: Selection
+    wishes: list[Wish]

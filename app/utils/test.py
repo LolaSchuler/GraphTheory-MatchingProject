@@ -1,7 +1,7 @@
 import subprocess
 
 from app.matching.matchingLauncher import startMatching
-from app.visualization.textUI import launchGUI, determineSuitors, endMatching
+from app.ui.visualization.textUI import launchGUI, determineSuitors, endMatching
 
 
 def main():

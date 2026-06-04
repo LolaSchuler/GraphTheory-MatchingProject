@@ -1,5 +1,11 @@
 import json
 import random
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
+DATASET_DIR = BASE_DIR / "dataset"
+
+DATASET_DIR.mkdir(exist_ok=True)
 
 NUM_SCHOOLS = 3
 NUM_STUDENTS = NUM_SCHOOLS * 15
@@ -77,7 +83,7 @@ for i in range(NUM_SCHOOLS):
     schools.append(
         {
             "id": school_id,
-            "name": f"Ecole {school_id}",
+            "name": f"School {school_id}",
             "academy": random.choice(academies),
             "type": school_type,
             "capacity": capacity,
@@ -107,11 +113,11 @@ for i in range(1, NUM_STUDENTS + 1):
             "specialty": specialty,
             "grade": grade,
             "academy": random.choice(academies),
+            "capacity": 1,
             "wishes": [
                 {"id": school, "rank": rank + 1}
                 for rank, school in enumerate(student_wishes)
             ],
-            "capacity": 1,
         }
     )
 
@@ -125,10 +131,10 @@ for school in schools:
     ]
 
 # Export
-with open("./app/data/schools.json", "w", encoding="utf-8") as f:
+with open(DATASET_DIR / "schools.json", "w", encoding="utf-8") as f:
     json.dump(schools, f, indent=4)
 
-with open("./app/data/students.json", "w", encoding="utf-8") as f:
+with open(DATASET_DIR / "students.json", "w", encoding="utf-8") as f:
     json.dump(students, f, indent=4)
 
 print("Generation Successful")
