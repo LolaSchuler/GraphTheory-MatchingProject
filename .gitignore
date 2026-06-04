@@ -1,4 +1,5 @@
-.venv
-/outputs/*
+app/data/dataset
+app/outputs
 __pycache__/
-**/dataset/*
+.venv
+

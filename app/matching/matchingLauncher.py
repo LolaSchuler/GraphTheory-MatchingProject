@@ -3,8 +3,11 @@ from pathlib import Path
 from app.matching.roundManager import setupRound, launchRound, endRound
 from enum import Enum
 
+from pathlib import Path
+
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_PATH = PROJECT_ROOT / "app" / "data" / "dataset"
+OUTPUT_PATH = PROJECT_ROOT / "app" / "outputs" / "matching_output.json"
 
 
 class TYPE(Enum):
@@ -62,5 +65,5 @@ def createOutputJSON(suitors, courted):
                         "courted_name": courtedEntity.get("name", courtedEntity["id"]),
                     }
                 )
-    with open("./outputs/matching_output.json", "w", encoding="utf-8") as f:
+    with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=4)

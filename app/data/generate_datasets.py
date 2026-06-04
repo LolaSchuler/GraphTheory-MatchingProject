@@ -2,10 +2,11 @@ import json
 import random
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent
-DATASET_DIR = BASE_DIR / "dataset"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
-DATASET_DIR.mkdir(exist_ok=True)
+DATA_DIR = PROJECT_ROOT / "app" / "data" / "dataset"
+SCHOOLS_FILE = DATA_DIR / "schools.json"
+STUDENTS_FILE = DATA_DIR / "students.json"
 
 NUM_SCHOOLS = 3
 NUM_STUDENTS = NUM_SCHOOLS * 15
@@ -131,10 +132,10 @@ for school in schools:
     ]
 
 # Export
-with open(DATASET_DIR / "schools.json", "w", encoding="utf-8") as f:
+with open(SCHOOLS_FILE, "w", encoding="utf-8") as f:
     json.dump(schools, f, indent=4)
 
-with open(DATASET_DIR / "students.json", "w", encoding="utf-8") as f:
+with open(STUDENTS_FILE, "w", encoding="utf-8") as f:
     json.dump(students, f, indent=4)
 
 print("Generation Successful")
