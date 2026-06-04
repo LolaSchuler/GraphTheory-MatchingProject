@@ -1,22 +1,20 @@
 import subprocess
 
-from app.matching.matchingLauncher import *
-from app.visualization.textUI import *
+from app.matching.matchingLauncher import startMatching
+from app.visualization.textUI import launchGUI, determineSuitors, endMatching
 
 
-def main() :
+def main():
     generateDataSets()
     launchGUI()
     typeSuitors = determineSuitors()
-    nbRounds =startMatching(typeSuitors)
+    nbRounds = startMatching(typeSuitors)
     endMatching(nbRounds)
 
+
 def generateDataSets():
-    subprocess.run(
-        ["python3", "./app/data/generate_datasets.py"],
-        check=True
-    )
+    subprocess.run(["python3", "./app/data/generate_datasets.py"], check=True)
 
 
-if __name__ == "__main__" :
+if __name__ == "__main__":
     main()
