@@ -12,6 +12,7 @@ def setupRound(suitors, courted):
         # Else, add the suitor to his current wish's balcony
         targetId = suitor["wishes"][suitor["current_wish"]]["id"]
         balconies[targetId].append(suitor)
+        suitor["current_wish"] += 1
     return balconies
 
 
@@ -36,7 +37,6 @@ def launchRound(balconies, courted):
         for rejectedSuitor in rejected:
             if courtedEntity in rejectedSuitor["matches"]:
                 rejectedSuitor["matches"].remove(courtedEntity)
-            rejectedSuitor["current_wish"] += 1
 
 
 def endRound(suitors):

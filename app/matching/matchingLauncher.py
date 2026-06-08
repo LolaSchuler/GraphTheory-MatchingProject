@@ -1,14 +1,44 @@
 import json
+import subprocess
+from pathlib import Path
+from enum import Enum
 
 from app.matching.roundManager import setupRound, launchRound, endRound
-from enum import Enum
+from app.matching.serializer import serializeCourted, saveJSON, serializeSuitors
 
 
 class TYPE(Enum):
     SCHOOL, STUDENTS = range(2)
 
 
+def startMatching(suitorChoice):
+    # Initialize suitors and courted
+    suitors, courted = initMatching(suitorChoice)
+    # Launch the matching loop
+    nbRounds = 0
+    finished = False
+    while not finished:
+        nbRounds += 1
+        balconies = setupRound(suitors, courted)
+        launchRound(balconies, courted)
+        finished = endRound(suitors)
+        if not finished:
+            data_suitors = serializeSuitors(nbRounds, suitors)
+            data_courted = serializeCourted(nbRounds, balconies, courted)
+            round_data = {
+                "round": nbRounds,
+                "suitors": data_suitors,
+                "courted": data_courted,
+            }
+            saveJSON(round_data, f"./outputs/rounds/round_{nbRounds}.json")
+    data = serializeSuitors(nbRounds, suitors)
+    saveJSON(data, f"./outputs/final_matches.json")
+    return nbRounds
+
+
 def initMatching(suitorChoice):
+    # Clear content of rounds directory
+    clearRoundsDirectory()
     # Load school and student data from json files
     schoolsDataPath = "./app/data/schools.json"
     studentsDataPath = "./app/data/students.json"
@@ -30,34 +60,12 @@ def initMatching(suitorChoice):
     return suitors, courted
 
 
-def startMatching(suitorChoice):
-    # Initialize suitors and courted
-    suitors, courted = initMatching(suitorChoice)
-    # Launch the matching loop
-    nbRounds = 0
-    finished = False
-    while not finished:
-        nbRounds += 1
-        balconies = setupRound(suitors, courted)
-        launchRound(balconies, courted)
-        finished = endRound(suitors)
-    createOutputJSON(suitors, courted)
-    return nbRounds
+def generateNewDatasets():
+    subprocess.run(["python3", "./app/data/generate_datasets.py"], check=True)
 
 
-def createOutputJSON(suitors, courted):
-    output = []
-    for suitor in suitors:
-        for match in suitor["matches"]:
-            courtedEntity = next((c for c in courted if c["id"] == match["id"]), None)
-            if courtedEntity is not None:
-                output.append(
-                    {
-                        "suitor_id": suitor["id"],
-                        "suitor_name": suitor.get("name", suitor["id"]),
-                        "courted_id": courtedEntity["id"],
-                        "courted_name": courtedEntity.get("name", courtedEntity["id"]),
-                    }
-                )
-    with open("./outputs/matching_output.json", "w", encoding="utf-8") as f:
-        json.dump(output, f, ensure_ascii=False, indent=4)
+def clearRoundsDirectory():
+    roundsPath = Path("./outputs/rounds")
+    roundsPath.mkdir(exist_ok=True)
+    for file in roundsPath.glob("*.json"):
+        file.unlink()
