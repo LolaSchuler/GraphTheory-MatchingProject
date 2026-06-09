@@ -67,8 +67,11 @@ def initMatching(suitorChoice):
     return suitors, courted
 
 
-def generateNewDatasets():
-    subprocess.run(["python3", "./app/data/generate_datasets.py"], check=True)
+def generateNewDatasets(nbSchools, nbStudents):
+    subprocess.run(
+        ["python3", "./app/data/generate_datasets.py", str(nbSchools), str(nbStudents)],
+        check=True,
+    )
 
 
 def clearRoundsDirectory():

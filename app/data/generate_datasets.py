@@ -1,8 +1,9 @@
 import json
 import random
+import sys
 
-NUM_SCHOOLS = 3
-NUM_STUDENTS = NUM_SCHOOLS * 15
+NUM_SCHOOLS = int(sys.argv[1]) if len(sys.argv) > 1 else 3
+NUM_STUDENTS = int(sys.argv[2]) if len(sys.argv) > 2 else 50
 
 academies = ["Versailles", "Toulouse", "Paris", "Lyon"]
 school_types = ["BTS", "Université", "IUT", "CPGE"]

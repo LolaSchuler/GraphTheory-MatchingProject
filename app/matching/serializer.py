@@ -22,7 +22,11 @@ def serializeSuitors(suitors):
 
 
 def serializeUnsuccessful(suitors, courted):
-    unmatched = [s["id"] for s in suitors if len(s["matches"]) == 0]
+    unmatched = [
+        {"id": s["id"], "filled": len(s["matches"]), "capacity": s["capacity"]}
+        for s in suitors
+        if len(s["matches"]) == 0
+    ]
     vacant = [
         {"id": c["id"], "filled": len(c["matches"]), "capacity": c["capacity"]}
         for c in courted
