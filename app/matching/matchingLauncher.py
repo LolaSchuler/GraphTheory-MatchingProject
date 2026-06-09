@@ -4,7 +4,12 @@ from pathlib import Path
 from enum import Enum
 
 from app.matching.roundManager import setupRound, launchRound, endRound
-from app.matching.serializer import serializeCourted, saveJSON, serializeSuitors
+from app.matching.serializer import (
+    serializeCourted,
+    saveJSON,
+    serializeSuitors,
+    serializeUnsuccessful,
+)
 
 
 class TYPE(Enum):
@@ -23,16 +28,18 @@ def startMatching(suitorChoice):
         launchRound(balconies, courted)
         finished = endRound(suitors)
         if not finished:
-            data_suitors = serializeSuitors(nbRounds, suitors)
-            data_courted = serializeCourted(nbRounds, balconies, courted)
+            data_suitors = serializeSuitors(suitors)
+            data_courted = serializeCourted(balconies, courted)
             round_data = {
                 "round": nbRounds,
                 "suitors": data_suitors,
                 "courted": data_courted,
             }
             saveJSON(round_data, f"./outputs/rounds/round_{nbRounds}.json")
-    data = serializeSuitors(nbRounds, suitors)
-    saveJSON(data, f"./outputs/final_matches.json")
+    data = serializeSuitors(suitors)
+    saveJSON(data, "./outputs/final_matches.json")
+    unmatched_and_vacant = serializeUnsuccessful(suitors, courted)
+    saveJSON(unmatched_and_vacant, "./outputs/unsuccessful_entities.json")
     return nbRounds
 
 

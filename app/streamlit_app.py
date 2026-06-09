@@ -24,5 +24,4 @@ suitorChoice = (
 
 if st.button("Start the matching process"):
     nbRounds = startMatching(suitorChoice)
-
     st.success(f"Matching finished in {nbRounds} rounds")
