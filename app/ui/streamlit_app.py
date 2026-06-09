@@ -1,13 +1,20 @@
 import streamlit as st
 import json
 
-from app.matching.matchingLauncher import startMatching, TYPE, generateNewDatasets
-
-if "matching_done" not in st.session_state:
-    st.session_state.matching_done = False
+from app.matching.matchingLauncher import (
+    startMatching,
+    TYPE,
+    generateNewDatasets,
+    OUTPUT_FILE_PATH,
+    UNSUCCESSFUL_FILE_PATH,
+)
 
 st.set_page_config(page_title="Stable Parcoursup", layout="wide")
 st.title("Stable Parcoursup")
+
+# Pour n'afficher les métriques qu'une fois qu'on a lancé le matching pour la première fois
+if "matching_done" not in st.session_state:
+    st.session_state.matching_done = False
 
 # TODO : montrer le processus step by step !
 st.checkbox("Show the matching process step by step", key="show_matching_process")
@@ -45,7 +52,7 @@ if st.button("Start the matching process"):
 # Présentation des résultats
 if st.session_state.matching_done:
     # Chargement matches réussis
-    with open("./outputs/final_matches.json") as f:
+    with open(OUTPUT_FILE_PATH) as f:
         raw_matches = json.load(f)["matches"]
     # Si c'est les étudiants les suitors, il faut inverser les matches pour pouvoir présenter les résultats par école
     if suitorChoice == TYPE.STUDENTS:
@@ -59,25 +66,19 @@ if st.session_state.matching_done:
         matches_by_school = raw_matches
 
     # Chargement matches ratés
-    with open("./outputs/unsuccessful_entities.json") as f:
+
+    with open(UNSUCCESSFUL_FILE_PATH) as f:
         unsuccessful = json.load(f)
     if suitorChoice == TYPE.STUDENTS:
         # Déjà bon
-        unmatched_students = unsuccessful["suitors_with_no_match"]
+        unmatched_students = [e["id"] for e in unsuccessful["suitors_with_no_match"]]
         vacant_schools = unsuccessful["courted_with_no_match"]
     # Si c'est les écoles les suitors, il faut inverser les matches ratés pour pouvoir présenter les résultats ratés par étudiant
     else:
         unmatched_students = [e["id"] for e in unsuccessful["courted_with_no_match"]]
-        vacant_schools = [
-            {"id": s, "filled": len(matches_by_school.get(s, [])), "capacity": ...}
-            for s in unsuccessful["suitors_with_no_match"]
-        ]
+        vacant_schools = unsuccessful["suitors_with_no_match"]
 
     total_matched = sum(len(v) for v in matches_by_school.values())
-    if suitorChoice == TYPE.STUDENTS:
-        unmatched_students = [e["id"] for e in unsuccessful["suitors_with_no_match"]]
-    else:
-        unmatched_students = [e["id"] for e in unsuccessful["courted_with_no_match"]]
 
     col1, col2, col3 = st.columns(3)
     col1.metric("Étudiants affectés", total_matched)

@@ -13,10 +13,9 @@ from app.matching.serializer import (
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 DATA_PATH = PROJECT_ROOT / "app" / "data" / "dataset"
-OUTPUT_PATH = PROJECT_ROOT / "app" / "outputs" / "matching_output.json"
-
-DATA_PATH.mkdir(parents=True, exist_ok=True)
-OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+OUTPUT_FILE_PATH = PROJECT_ROOT / "app" / "outputs" / "matching_output.json"
+UNSUCCESSFUL_FILE_PATH = PROJECT_ROOT / "app" / "outputs" / "unsuccessful_entities.json"
+ROUNDS_PATH = PROJECT_ROOT / "app" / "outputs" / "rounds"
 
 
 class TYPE(Enum):
@@ -42,17 +41,23 @@ def startMatching(suitorChoice):
                 "suitors": data_suitors,
                 "courted": data_courted,
             }
-            saveJSON(round_data, f"./outputs/rounds/round_{nbRounds}.json")
-    data = serializeSuitors(suitors)
-    saveJSON(data, "./outputs/final_matches.json")
+            saveJSON(round_data, str(ROUNDS_PATH / f"round_{nbRounds}.json"))
+    final_matches = serializeSuitors(suitors)
+    saveJSON(final_matches, OUTPUT_FILE_PATH)
     unmatched_and_vacant = serializeUnsuccessful(suitors, courted)
-    saveJSON(unmatched_and_vacant, "./outputs/unsuccessful_entities.json")
+    saveJSON(unmatched_and_vacant, UNSUCCESSFUL_FILE_PATH)
     return nbRounds
 
 
 def initMatching(suitorChoice):
+    # Make sure every directory we are gonna use exists
+    DATA_PATH.mkdir(parents=True, exist_ok=True)
+    OUTPUT_FILE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    UNSUCCESSFUL_FILE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    ROUNDS_PATH.mkdir(parents=True, exist_ok=True)
     # Clear content of rounds directory
     clearRoundsDirectory()
+
     # Load school and student data from json files
     schoolsDataPath = DATA_PATH / "schools.json"
     studentsDataPath = DATA_PATH / "students.json"
@@ -82,7 +87,5 @@ def generateNewDatasets(nbSchools, nbStudents):
 
 
 def clearRoundsDirectory():
-    roundsPath = Path("./outputs/rounds")
-    roundsPath.mkdir(exist_ok=True)
-    for file in roundsPath.glob("*.json"):
+    for file in ROUNDS_PATH.glob("*.json"):
         file.unlink()
