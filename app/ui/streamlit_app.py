@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 import json
 
 from app.matching.matchingLauncher import (
@@ -7,7 +8,16 @@ from app.matching.matchingLauncher import (
     generateNewDatasets,
     OUTPUT_FILE_PATH,
     UNSUCCESSFUL_FILE_PATH,
+    ROUNDS_PATH,
 )
+
+
+def highlight_status(row):
+    if "Accepté" in row["Statut"]:
+        return ["", "", "background-color: #d4edda; color: #155724"]
+    else:
+        return ["", "", "background-color: #f8d7da; color: #721c24"]
+
 
 st.set_page_config(page_title="Stable Parcoursup", layout="wide")
 st.title("Stable Parcoursup")
@@ -84,7 +94,6 @@ if st.session_state.matching_done:
         matches_by_school = raw_matches
 
     # Chargement matches ratés
-
     with open(UNSUCCESSFUL_FILE_PATH) as f:
         unsuccessful = json.load(f)
     if suitorChoice == TYPE.STUDENTS:
@@ -97,11 +106,94 @@ if st.session_state.matching_done:
         vacant_schools = unsuccessful["suitors_with_no_match"]
 
     total_matched = sum(len(v) for v in matches_by_school.values())
+    total_students = total_matched + len(unmatched_students)
+    pct = round(total_matched / total_students * 100) if total_students > 0 else 0
 
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     col1.metric("Étudiants affectés", total_matched)
-    col2.metric("Étudiants non affectés", len(unmatched_students))
-    col3.metric("Rounds", st.session_state.get("nb_rounds", "—"))
+    col2.metric("Taux d'affectation", f"{pct}%")
+    col3.metric("Étudiants non affectés", len(unmatched_students))
+    col4.metric("Rounds", st.session_state.get("nb_rounds", "—"))
 
-# TODO : montrer le processus step by step !
+    # Présenter les affectations par école
+    st.subheader("Affectations par école")
+    for school, students in matches_by_school.items():
+        with st.expander(f"{school} — {len(students)} étudiants"):
+            st.write(", ".join(students))
+
+    # Présenter les étudiants non affectés à une école
+
+    if len(unmatched_students) > 0:
+        st.subheader("Non affectés")
+        st.warning(", ".join(unmatched_students))
+    else:
+        st.success("Tous les étudiants ont été affectés.")
+
+    # Présentation des rounds individuels
+    if st.session_state.show_matching_process:
+        st.subheader("Processus de matching")
+        rounds_path = ROUNDS_PATH
+        round_files = sorted(
+            rounds_path.glob("round_*.json"), key=lambda f: int(f.stem.split("_")[1])
+        )
+
+        if "current_round_index" not in st.session_state:
+            st.session_state.current_round_index = 0
+
+        total_rounds = len(round_files)
+
+        # Au cas où le nombre de rounds change entre deux matchings
+        if st.session_state.current_round_index >= total_rounds:
+            st.session_state.current_round_index = 0
+
+        # Navigation entre les rounds
+        col_prev, col_label, col_next = st.columns([1, 3, 1])
+        with col_prev:
+            if st.button(
+                "← Précédent", disabled=st.session_state.current_round_index == 0
+            ):
+                st.session_state.current_round_index -= 1
+                st.rerun()
+        with col_label:
+            st.markdown(
+                f"<div style='text-align:center; font-weight:bold; padding-top:6px;'>"
+                f"Round {st.session_state.current_round_index + 1} / {total_rounds}</div>",
+                unsafe_allow_html=True,
+            )
+        with col_next:
+            if st.button(
+                "Suivant →",
+                disabled=st.session_state.current_round_index == total_rounds - 1,
+            ):
+                st.session_state.current_round_index += 1
+                st.rerun()
+
+        # Affichage du round actuel
+        round_file = round_files[st.session_state.current_round_index]
+        with open(round_file) as f:
+            round_data = json.load(f)
+        balconies = round_data["courted"]["balconies"]
+        matches = round_data["courted"]["matches"]
+
+        rows = []
+        for courted_id, suitors_in_balcony in balconies.items():
+            accepted = matches.get(courted_id, [])
+            for suitor_id in suitors_in_balcony:
+                status = "Accepté" if suitor_id in accepted else "Refusé"
+                rows.append(
+                    {
+                        "Courtisé": courted_id,
+                        "Courtisant": suitor_id,
+                        "Statut": status,
+                    }
+                )
+        if rows:
+            df = pd.DataFrame(rows)
+            st.dataframe(
+                df.style.apply(highlight_status, axis=1),
+                use_container_width=True,
+                hide_index=True,
+            )
+        else:
+            st.caption("Aucun candidat ce round.")
 st.checkbox("Show the matching process step by step", key="show_matching_process")
