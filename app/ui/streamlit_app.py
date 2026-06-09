@@ -76,6 +76,7 @@ if st.button("Start the matching process"):
     st.success(f"Matching finished in {nbRounds} rounds")
     st.session_state.matching_done = True
 
+st.checkbox("Show the matching process step by step", key="show_matching_process")
 
 # Présentation des résultats
 if st.session_state.matching_done:
@@ -196,4 +197,3 @@ if st.session_state.matching_done:
             )
         else:
             st.caption("Aucun candidat ce round.")
-st.checkbox("Show the matching process step by step", key="show_matching_process")
