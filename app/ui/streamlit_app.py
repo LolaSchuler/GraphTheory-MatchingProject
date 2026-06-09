@@ -34,11 +34,7 @@ if st.button("Generate new datasets"):
     st.success("New datasets generated")
 
 # Lancement du matching
-st.radio(
-    "Who are the suitors ?",
-    ("Schools", "Students"),
-    key="suitor_choice",
-)
+st.radio("Who are the suitors ?", ("Schools", "Students"), key="suitor_choice")
 suitorChoice = (
     TYPE.SCHOOL if st.session_state.suitor_choice == "Schools" else TYPE.STUDENTS
 )
@@ -66,7 +62,6 @@ if st.session_state.matching_done:
         matches_by_school = raw_matches
 
     # Chargement matches ratés
-
     with open(UNSUCCESSFUL_FILE_PATH) as f:
         unsuccessful = json.load(f)
     if suitorChoice == TYPE.STUDENTS:
@@ -84,3 +79,18 @@ if st.session_state.matching_done:
     col1.metric("Étudiants affectés", total_matched)
     col2.metric("Étudiants non affectés", len(unmatched_students))
     col3.metric("Rounds", st.session_state.get("nb_rounds", "—"))
+
+    # Présenter les affectations par école
+    st.subheader("Affectations par école")
+    for school, students in matches_by_school.items():
+        with st.expander(f"{school} — {len(students)} étudiants"):
+            st.write(", ".join(students))
+
+    # Présenter les étudiants non affectés à une école
+
+    # Non affectés
+    if len(unmatched_students) > 0:
+        st.subheader("Non affectés")
+        st.warning(", ".join(unmatched_students))
+    else:
+        st.success("Tous les étudiants ont été affectés.")
