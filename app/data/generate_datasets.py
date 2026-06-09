@@ -18,23 +18,10 @@ academies = ["Versailles", "Toulouse", "Paris", "Lyon"]
 school_types = ["BTS", "Université", "IUT", "CPGE"]
 
 # Capacity
-weights = [random.uniform(0.5, 1.5) for i in range(NUM_SCHOOLS)]
-weight_sum = sum(weights)
+capacities = []
 
-capacities = [int(NUM_STUDENTS * w / weight_sum) for w in weights]
-
-diff = NUM_STUDENTS - sum(capacities)
-
-i = 0
-while diff != 0:
-    if diff > 0:
-        capacities[i] += 1
-        diff -= 1
-    else:
-        if capacities[i] > 1:
-            capacities[i] -= 1
-            diff += 1
-    i = (i + 1) % NUM_SCHOOLS
+for _ in range(NUM_SCHOOLS):
+    capacities.append(random.randint(5, 30))
 
 # School Generation
 schools = []

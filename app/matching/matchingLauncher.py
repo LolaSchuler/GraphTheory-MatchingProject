@@ -12,7 +12,7 @@ from app.matching.serializer import (
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
-DATA_PATH = PROJECT_ROOT / "app" / "data" / "dataset"
+DATA_PATH = PROJECT_ROOT / "app" / "data"
 OUTPUT_FILE_PATH = PROJECT_ROOT / "app" / "outputs" / "matching_output.json"
 UNSUCCESSFUL_FILE_PATH = PROJECT_ROOT / "app" / "outputs" / "unsuccessful_entities.json"
 ROUNDS_PATH = PROJECT_ROOT / "app" / "outputs" / "rounds"
@@ -41,7 +41,7 @@ def startMatching(suitorChoice):
                 "suitors": data_suitors,
                 "courted": data_courted,
             }
-            saveJSON(round_data, str(ROUNDS_PATH / f"round_{nbRounds}.json"))
+            saveJSON(round_data, f"{ROUNDS_PATH}/round_{nbRounds}.json")
     final_matches = serializeSuitors(suitors)
     saveJSON(final_matches, OUTPUT_FILE_PATH)
     unmatched_and_vacant = serializeUnsuccessful(suitors, courted)
@@ -59,8 +59,8 @@ def initMatching(suitorChoice):
     clearRoundsDirectory()
 
     # Load school and student data from json files
-    schoolsDataPath = DATA_PATH / "schools.json"
-    studentsDataPath = DATA_PATH / "students.json"
+    schoolsDataPath = DATA_PATH / "dataset" / "schools.json"
+    studentsDataPath = DATA_PATH / "dataset" / "students.json"
     # Initialize suitors and courted
     with open(schoolsDataPath, "r") as schoolsData:
         schools = json.loads(schoolsData.read())
@@ -81,7 +81,12 @@ def initMatching(suitorChoice):
 
 def generateNewDatasets(nbSchools, nbStudents):
     subprocess.run(
-        ["python3", "./app/data/generate_datasets.py", str(nbSchools), str(nbStudents)],
+        [
+            "python3",
+            f"{DATA_PATH}/generate_datasets.py",
+            str(nbSchools),
+            str(nbStudents),
+        ],
         check=True,
     )
 

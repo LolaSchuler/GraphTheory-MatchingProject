@@ -26,16 +26,25 @@ st.title("Stable Parcoursup")
 if "matching_done" not in st.session_state:
     st.session_state.matching_done = False
 
-# TODO : montrer le processus step by step !
-st.checkbox("Show the matching process step by step", key="show_matching_process")
-
 # Génération des datasets
-st.number_input(
-    label="Number of schools", min_value=1, step=1, value=3, key="nb_schools"
+col1, col2 = st.columns(2)
+
+col1.number_input(
+    "Number of schools",
+    min_value=1,
+    step=1,
+    value=3,
+    key="nb_schools",
 )
-st.number_input(
-    label="Number of students", min_value=1, step=1, value=50, key="nb_students"
+
+col2.number_input(
+    "Number of students",
+    min_value=1,
+    step=1,
+    value=50,
+    key="nb_students",
 )
+
 if st.button("Generate new datasets"):
     generateNewDatasets(
         nbSchools=st.session_state.nb_schools,
@@ -44,7 +53,20 @@ if st.button("Generate new datasets"):
     st.success("New datasets generated")
 
 # Lancement du matching
-st.radio("Who are the suitors ?", ("Schools", "Students"), key="suitor_choice")
+st.radio(
+    "Who are the suitors ?",
+    ("Schools", "Students"),
+    key="suitor_choice",
+)
+
+prev_choice = st.session_state.get("prev_suitor_choice", None)
+
+if prev_choice is not None and prev_choice != st.session_state.suitor_choice:
+    st.session_state.matching_done = False
+    st.session_state.nb_rounds = None
+
+st.session_state.prev_suitor_choice = st.session_state.suitor_choice
+
 suitorChoice = (
     TYPE.SCHOOL if st.session_state.suitor_choice == "Schools" else TYPE.STUDENTS
 )
@@ -174,3 +196,4 @@ if st.session_state.matching_done:
             )
         else:
             st.caption("Aucun candidat ce round.")
+st.checkbox("Show the matching process step by step", key="show_matching_process")
