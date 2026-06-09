@@ -16,9 +16,6 @@ st.title("Stable Parcoursup")
 if "matching_done" not in st.session_state:
     st.session_state.matching_done = False
 
-# TODO : montrer le processus step by step !
-st.checkbox("Show the matching process step by step", key="show_matching_process")
-
 # Génération des datasets
 col1, col2 = st.columns(2)
 
@@ -105,3 +102,6 @@ if st.session_state.matching_done:
     col1.metric("Étudiants affectés", total_matched)
     col2.metric("Étudiants non affectés", len(unmatched_students))
     col3.metric("Rounds", st.session_state.get("nb_rounds", "—"))
+
+# TODO : montrer le processus step by step !
+st.checkbox("Show the matching process step by step", key="show_matching_process")
