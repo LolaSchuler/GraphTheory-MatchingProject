@@ -1,12 +1,12 @@
 import subprocess
 
 from app.matching.matchingLauncher import startMatching
-from app.ui.visualization.textUI import launchGUI, determineSuitors, endMatching
+from app.visualization.textUI import introGUI, determineSuitors, endMatching
 
 
 def main():
+    introGUI()
     generateDataSets()
-    launchGUI()
     typeSuitors = determineSuitors()
     nbRounds = startMatching(typeSuitors)
     endMatching(nbRounds)

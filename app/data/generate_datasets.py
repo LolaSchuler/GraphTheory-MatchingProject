@@ -1,5 +1,6 @@
 import json
 import random
+import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -10,8 +11,8 @@ STUDENTS_FILE = DATA_DIR / "students.json"
 
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-NUM_SCHOOLS = 3
-NUM_STUDENTS = NUM_SCHOOLS * 15
+NUM_SCHOOLS = int(sys.argv[1]) if len(sys.argv) > 1 else 3
+NUM_STUDENTS = int(sys.argv[2]) if len(sys.argv) > 2 else 50
 
 academies = ["Versailles", "Toulouse", "Paris", "Lyon"]
 school_types = ["BTS", "Université", "IUT", "CPGE"]
@@ -64,7 +65,7 @@ for i in range(NUM_SCHOOLS):
         "CPGE": {
             "general": int(capacity * 0.8),
             "technological": int(capacity * 0.2),
-            "professional": capacity - int(capacity * 0.8) - int(capacity * 0.1),
+            "professional": capacity - int(capacity * 0.8) - int(capacity * 0.2),
         },
     }[school_type]
 
@@ -107,7 +108,9 @@ for i in range(1, NUM_STUDENTS + 1):
     else:
         specialty = "professional"
 
-    student_wishes = random.sample([school["id"] for school in schools], k=NUM_SCHOOLS)
+    # Students form wishes for a subset of schools only (--> possibility of being accepted nowhere)
+    num_wishes = random.randint(1, NUM_SCHOOLS)
+    student_wishes = random.sample([school["id"] for school in schools], k=num_wishes)
     grade = round(random.uniform(9, 20), 1)
 
     students.append(
@@ -126,9 +129,15 @@ for i in range(1, NUM_STUDENTS + 1):
 
 # Rewrite schools wishes
 for school in schools:
-    school_wishes = random.sample(
-        [student["id"] for student in students], k=NUM_STUDENTS
-    )
+    minimum_grade = school["selection"]["minimum_grade"]
+    eligible_students = [s for s in students if s["grade"] >= minimum_grade]
+    # To avoid iterating over an empty list
+    if not eligible_students:
+        school_wishes = []
+    else:
+        school_wishes = random.sample(
+            [s["id"] for s in eligible_students], k=len(eligible_students)
+        )
     school["wishes"] = [
         {"id": student, "rank": rank + 1} for rank, student in enumerate(school_wishes)
     ]

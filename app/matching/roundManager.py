@@ -9,9 +9,13 @@ def setupRound(suitors, courted):
         # If no more wishes for this suitor
         if suitor["current_wish"] >= len(suitor["wishes"]):
             continue
-        # Else, add the suitor to his current wish's balcony
-        targetId = suitor["wishes"][suitor["current_wish"]]["id"]
-        balconies[targetId].append(suitor)
+        # Else, add the suitor to his n first wishes' balconies, n being the suitor's capacity
+        slots_available = suitor["capacity"] - len(suitor["matches"])
+        while slots_available > 0 and suitor["current_wish"] < len(suitor["wishes"]):
+            targetId = suitor["wishes"][suitor["current_wish"]]["id"]
+            balconies[targetId].append(suitor)
+            suitor["current_wish"] += 1
+            slots_available -= 1
     return balconies
 
 
@@ -21,9 +25,8 @@ def launchRound(balconies, courted):
         courtedId = courtedEntity["id"]
         candidates = courtedEntity["matches"] + balconies[courtedId]
         # Sort the candidates according to the wishes of the courtedEntity
-        candidates.sort(
-            key=lambda suitor: getRankById(courtedEntity["wishes"], suitor["id"])
-        )
+        wishes = courtedEntity["wishes"]
+        candidates.sort(key=lambda suitor: getRankById(wishes, suitor["id"]))
         # Keep only the best candidates according to the capacity of the courted entity and reject all others
         accepted = candidates[: courtedEntity["capacity"]]
         rejected = candidates[courtedEntity["capacity"] :]
@@ -36,7 +39,6 @@ def launchRound(balconies, courted):
         for rejectedSuitor in rejected:
             if courtedEntity in rejectedSuitor["matches"]:
                 rejectedSuitor["matches"].remove(courtedEntity)
-            rejectedSuitor["current_wish"] += 1
 
 
 def endRound(suitors):
@@ -54,3 +56,4 @@ def getRankById(wishes, suitorId):
     for i in range(len(wishes)):
         if wishes[i]["id"] == suitorId:
             return wishes[i]["rank"]
+    return float("inf")
