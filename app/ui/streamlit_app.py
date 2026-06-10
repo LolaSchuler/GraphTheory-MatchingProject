@@ -23,13 +23,19 @@ def highlight_status(row):
 st.set_page_config(page_title="Stable Parcoursup", layout="wide")
 st.title("Stable Parcoursup")
 
+# États de session
 # Pour n'afficher les métriques qu'une fois qu'on a lancé le matching pour la première fois
 if "matching_done" not in st.session_state:
     st.session_state.matching_done = False
 
+if "current_round_index" not in st.session_state:
+    st.session_state.current_round_index = 0
+
+if "nb_rounds" not in st.session_state:
+    st.session_state.nb_rounds = None
+
 # Génération des datasets
 col1, col2 = st.columns(2)
-
 col1.number_input(
     "Number of schools",
     min_value=1,
@@ -37,7 +43,6 @@ col1.number_input(
     value=3,
     key="nb_schools",
 )
-
 col2.number_input(
     "Number of students",
     min_value=1,
@@ -51,41 +56,71 @@ if st.button("Generate new datasets"):
         nbSchools=st.session_state.nb_schools,
         nbStudents=st.session_state.nb_students,
     )
+    # Invalidation des anciens résultats
+    st.session_state.matching_done = False
+    st.session_state.nb_rounds = None
+    st.session_state.current_round_index = 0
+    # Affichage utilisateur
     st.success("New datasets generated")
 
-# Lancement du matching
+# Choix des suitors
 st.radio(
     "Who are the suitors ?",
     ("Schools", "Students"),
     key="suitor_choice",
 )
-
+# Si on change de mode, on invalide le matching précédent
 prev_choice = st.session_state.get("prev_suitor_choice", None)
-
 if prev_choice is not None and prev_choice != st.session_state.suitor_choice:
     st.session_state.matching_done = False
     st.session_state.nb_rounds = None
-
+    st.session_state.current_round_index = 0
 st.session_state.prev_suitor_choice = st.session_state.suitor_choice
 
+# Traduction du choix utilisateur des suitors
 suitorChoice = (
     TYPE.SCHOOL if st.session_state.suitor_choice == "Schools" else TYPE.STUDENTS
 )
+
+# Invalidation si les paramètres changent après un matching
+current_config = {
+    "suitor": st.session_state.suitor_choice,
+    "schools": st.session_state.nb_schools,
+    "students": st.session_state.nb_students,
+}
+if (
+    "last_matching_config" in st.session_state
+    and current_config != st.session_state.last_matching_config
+):
+    st.session_state.matching_done = False
+
+# Démarrage du matching
 if st.button("Start the matching process"):
     nbRounds = startMatching(suitorChoice)
     st.session_state.nb_rounds = nbRounds
-    st.success(f"Matching finished in {nbRounds} rounds")
     st.session_state.matching_done = True
+    st.session_state.current_round_index = 0
+    st.session_state.last_matching_config = {
+        "suitor": st.session_state.suitor_choice,
+        "schools": st.session_state.nb_schools,
+        "students": st.session_state.nb_students,
+    }
+    st.success(f"Matching finished in {nbRounds} rounds")
 
-st.checkbox("Show the matching process step by step", key="show_matching_process")
+
+st.checkbox(
+    "Show the matching process step by step",
+    key="show_matching_process",
+)
 
 
-# Présentation des résultats une fois que on a appuyé sur le bouton "Start the matching process"
+# Présentation des résultats
 if st.session_state.matching_done:
     # Chargement matches réussis
     with open(OUTPUT_FILE_PATH) as f:
         raw_matches = json.load(f)["matches"]
-    # Si c'est les étudiants les suitors, il faut inverser les matches pour pouvoir présenter les résultats par école
+    # Si c'est les étudiants les suitors, il faut inverser
+    # les matches pour pouvoir présenter les résultats par école
     if suitorChoice == TYPE.STUDENTS:
         # Regroupement par école
         matches_by_school = {}
@@ -103,7 +138,8 @@ if st.session_state.matching_done:
         # Déjà bon
         unmatched_students = [e["id"] for e in unsuccessful["suitors_with_no_match"]]
         vacant_schools = unsuccessful["courted_with_no_match"]
-    # Si c'est les écoles les suitors, il faut inverser les matches ratés pour pouvoir présenter les résultats ratés par étudiant
+    # Si c'est les écoles les suitors, il faut inverser les matches ratés
+    # pour pouvoir présenter les résultats ratés par étudiant
     else:
         unmatched_students = [e["id"] for e in unsuccessful["courted_with_no_match"]]
         vacant_schools = unsuccessful["suitors_with_no_match"]
@@ -116,7 +152,7 @@ if st.session_state.matching_done:
     col1.metric("Étudiants affectés", total_matched)
     col2.metric("Taux d'affectation", f"{pct}%")
     col3.metric("Étudiants non affectés", len(unmatched_students))
-    col4.metric("Rounds", st.session_state.get("nb_rounds", "—"))
+    col4.metric("Rounds", st.session_state.nb_rounds)
 
     # Chargement des données des étudiants et des écoles
     with open(DATA_PATH / "dataset" / "schools.json") as f:
