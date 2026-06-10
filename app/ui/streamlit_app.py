@@ -97,6 +97,7 @@ if (
 # Démarrage du matching
 if st.button("Start the matching process"):
     nbRounds = startMatching(suitorChoice)
+
     st.session_state.nb_rounds = nbRounds
     st.session_state.matching_done = True
     st.session_state.current_round_index = 0
@@ -144,7 +145,7 @@ if st.session_state.matching_done:
         unmatched_students = [e["id"] for e in unsuccessful["courted_with_no_match"]]
         vacant_schools = unsuccessful["suitors_with_no_match"]
 
-    total_matched = sum(len(v) for v in matches_by_school.values())
+    total_matched = sum(len(students) for students in matches_by_school.values())
     total_students = total_matched + len(unmatched_students)
     pct = round(total_matched / total_students * 100) if total_students > 0 else 0
 
@@ -181,26 +182,28 @@ if st.session_state.matching_done:
                             for w in student.get("wishes", [])
                             if w["id"] == school_id
                         ),
-                        "?",
+                        None,
                     )
                     rows.append(
                         {
                             "Étudiant": sid,
                             "Spécialité": student.get("specialty", "?"),
                             "Moyenne": student.get("grade", "?"),
-                            "N° de vœu": wish_rank,
+                            "N° de vœu": str(wish_rank)
+                            if wish_rank is not None
+                            else "?",
                         }
                     )
                 st.dataframe(
                     pd.DataFrame(rows),
-                    use_container_width=True,
+                    width="stretch",
                     hide_index=True,
                 )
             else:
                 st.caption("Aucun étudiant affecté.")
 
     # Présenter les étudiants non affectés à une école
-    if len(unmatched_students) > 0:
+    if unmatched_students:
         st.subheader("Non affectés")
         rows = []
         for sid in unmatched_students:
@@ -215,7 +218,7 @@ if st.session_state.matching_done:
             )
         st.dataframe(
             pd.DataFrame(rows),
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
         )
     else:
@@ -228,9 +231,9 @@ if st.session_state.matching_done:
         round_files = sorted(
             rounds_path.glob("round_*.json"), key=lambda f: int(f.stem.split("_")[1])
         )
-
-        if "current_round_index" not in st.session_state:
-            st.session_state.current_round_index = 0
+        if not round_files:
+            st.info("No round data available.")
+            st.stop()
 
         total_rounds = len(round_files)
 
@@ -283,7 +286,7 @@ if st.session_state.matching_done:
             df = pd.DataFrame(rows)
             st.dataframe(
                 df.style.apply(highlight_status, axis=1),
-                use_container_width=True,
+                width="stretch",
                 hide_index=True,
             )
         else:
