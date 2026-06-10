@@ -25,10 +25,12 @@ def launchRound(balconies, courted):
         courtedId = courtedEntity["id"]
         candidates = courtedEntity["matches"] + balconies[courtedId]
         # Remove from the candidates all those who aren't in the courted's wishes
+        courted_wishes_ids = {w["id"] for w in courtedEntity.get("wishes", [])}
         candidates = [
             s
             for s in candidates
             if any(w["id"] == courtedId for w in s.get("wishes", []))
+            and s["id"] in courted_wishes_ids
         ]
         # Sort the candidates according to the wishes of the courtedEntity
         wishes = courtedEntity["wishes"]
