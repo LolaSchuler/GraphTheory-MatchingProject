@@ -30,9 +30,11 @@ def startMatching(suitorChoice):
     finished = False
     while not finished:
         nbRounds += 1
+        # Round management
         balconies = setupRound(suitors, courted)
         launchRound(balconies, courted)
         finished = endRound(suitors)
+        # Export round JSON output
         if not finished:
             data_suitors = serializeSuitors(suitors)
             data_courted = serializeCourted(balconies, courted)
@@ -42,6 +44,7 @@ def startMatching(suitorChoice):
                 "courted": data_courted,
             }
             saveJSON(round_data, f"{ROUNDS_PATH}/round_{nbRounds}.json")
+    # Export final JSON output
     final_matches = serializeSuitors(suitors)
     saveJSON(final_matches, OUTPUT_FILE_PATH)
     unmatched_and_vacant = serializeUnsuccessful(suitors, courted)
@@ -79,6 +82,7 @@ def initMatching(suitorChoice):
     return suitors, courted
 
 
+# Function used in debug test mode
 def generateNewDatasets(nbSchools, nbStudents):
     subprocess.run(
         [
@@ -91,6 +95,7 @@ def generateNewDatasets(nbSchools, nbStudents):
     )
 
 
+# Delete every file in rounds output directory
 def clearRoundsDirectory():
     for file in ROUNDS_PATH.glob("*.json"):
         file.unlink()
