@@ -9,6 +9,7 @@ from app.matching.matchingLauncher import (
     OUTPUT_FILE_PATH,
     UNSUCCESSFUL_FILE_PATH,
     ROUNDS_PATH,
+    DATA_PATH,
 )
 
 
@@ -78,7 +79,8 @@ if st.button("Start the matching process"):
 
 st.checkbox("Show the matching process step by step", key="show_matching_process")
 
-# Présentation des résultats
+
+# Présentation des résultats une fois que on a appuyé sur le bouton "Start the matching process"
 if st.session_state.matching_done:
     # Chargement matches réussis
     with open(OUTPUT_FILE_PATH) as f:
@@ -87,8 +89,8 @@ if st.session_state.matching_done:
     if suitorChoice == TYPE.STUDENTS:
         # Regroupement par école
         matches_by_school = {}
-        for student_id, schools in raw_matches.items():
-            for school_id in schools:
+        for student_id, school_ids in raw_matches.items():
+            for school_id in school_ids:
                 matches_by_school.setdefault(school_id, []).append(student_id)
     else:
         # Déjà bon
@@ -116,17 +118,70 @@ if st.session_state.matching_done:
     col3.metric("Étudiants non affectés", len(unmatched_students))
     col4.metric("Rounds", st.session_state.get("nb_rounds", "—"))
 
+    # Chargement des données des étudiants et des écoles
+    with open(DATA_PATH / "dataset" / "schools.json") as f:
+        schools_data = {s["id"]: s for s in json.load(f)}
+    with open(DATA_PATH / "dataset" / "students.json") as f:
+        students_data = {s["id"]: s for s in json.load(f)}
+
     # Présenter les affectations par école
     st.subheader("Affectations par école")
-    for school, students in matches_by_school.items():
-        with st.expander(f"{school} — {len(students)} étudiants"):
-            st.write(", ".join(students))
+    for school_id, student_ids in matches_by_school.items():
+        school = schools_data.get(school_id, {})
+        capacity = school.get("capacity", "?")
+        school_type = school.get("type", "?")
+        nb_matched = len(student_ids)
+
+        with st.expander(
+            f"{school_id} ({school_type}) — {nb_matched} / {capacity} étudiants"
+        ):
+            if student_ids:
+                rows = []
+                for sid in student_ids:
+                    student = students_data.get(sid, {})
+                    wish_rank = next(
+                        (
+                            w["rank"]
+                            for w in student.get("wishes", [])
+                            if w["id"] == school_id
+                        ),
+                        "?",
+                    )
+                    rows.append(
+                        {
+                            "Étudiant": sid,
+                            "Spécialité": student.get("specialty", "?"),
+                            "Moyenne": student.get("grade", "?"),
+                            "N° de vœu": wish_rank,
+                        }
+                    )
+                st.dataframe(
+                    pd.DataFrame(rows),
+                    use_container_width=True,
+                    hide_index=True,
+                )
+            else:
+                st.caption("Aucun étudiant affecté.")
 
     # Présenter les étudiants non affectés à une école
-
     if len(unmatched_students) > 0:
         st.subheader("Non affectés")
-        st.warning(", ".join(unmatched_students))
+        rows = []
+        for sid in unmatched_students:
+            student = students_data.get(sid, {})
+            rows.append(
+                {
+                    "Étudiant": sid,
+                    "Spécialité": student.get("specialty", "?"),
+                    "Moyenne": student.get("grade", "?"),
+                    "Vœux": ", ".join(w["id"] for w in student.get("wishes", [])),
+                }
+            )
+        st.dataframe(
+            pd.DataFrame(rows),
+            use_container_width=True,
+            hide_index=True,
+        )
     else:
         st.success("Tous les étudiants ont été affectés.")
 
